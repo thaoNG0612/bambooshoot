@@ -3,7 +3,7 @@ import math as Math
 
 
 def getContract(web3):
-	return web3.eth.contract(address=web3.to_checksum_address(c.qfsAddress), abi=c.qfsAbi)
+	return web3.eth.contract(address=web3.to_checksum_address(c.busdAddress), abi=c.busdAbi)
 
 def getBalance(web3,address):
 	contract = getContract(web3)

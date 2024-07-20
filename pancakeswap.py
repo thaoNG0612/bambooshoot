@@ -3,6 +3,9 @@ import config #locally store on your machine only, DO NOT COMMIT THIS FILE TO GI
 import time
 import constant as c
 
+def getRouterContract(web3):
+	return web3.eth.contract(address=c.panRouterContractAddress, abi=c.panAbi)
+
 def buildTxn(web3,nonce,routerContract,tokenToBuy,tokenToSpend,senderAddress):
 	# Build Pancakeswap transaction
 	return routerContract.functions.swapExactETHForTokens(
@@ -19,18 +22,21 @@ def buildTxn(web3,nonce,routerContract,tokenToBuy,tokenToSpend,senderAddress):
 	})
 
 def swap(web3,tokenToBuyAddress,tokenToSpendAddress,senderAddress):
-	contract = web3.eth.contract(address=c.panRouterContractAddress, abi=c.panAbi)
+	router = getRouterContract(web3)
 	nonce=web3.eth.get_transaction_count(senderAddress)
 	# Buy & spend tokens
 	tokenToBuy = web3.to_checksum_address(tokenToBuyAddress)
 	tokenToSpend = web3.to_checksum_address(tokenToSpendAddress)
 	#Build + Sign txn
-	pancakeswap2_txn=buildTxn(web3,contract,tokenToBuy,tokenToSpend,senderAddress)
+	pancakeswap2_txn=buildTxn(web3,router,tokenToBuy,tokenToSpend,senderAddress)
 	signed_txn = web3.eth.account.sign_transaction(pancakeswap2_txn, private_key=config.private_key)
 	# Submit txn
 	return web3.eth.send_raw_transaction(signed_txn.rawTransaction)
 	
 
 
-
-
+def getAmountOut(web3,tokenToSpendAmount, tokenToSpendAddress, tokenToBuyAddress):
+	router = getRouterContract(web3)
+	tokenToBuy = web3.to_checksum_address(tokenToBuyAddress)
+	tokenToSpend = web3.to_checksum_address(tokenToSpendAddress)
+	return router.functions.getAmountsOut(tokenToSpendAmount, [tokenToSpend, tokenToBuy]).call()
