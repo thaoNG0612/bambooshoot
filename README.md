@@ -1,6 +1,11 @@
 # bambooshoot
 Em là búp măng non, em lớn lên trong nhiều ý tưởng...
 
+# References
+- [Introduction about blockchain (with Ethereum)](https://snakecharmers.ethereum.org/a-developers-guide-to-ethereum-pt-1/)
+- [Web3.py doc](https://web3py.readthedocs.io/en/stable/)
+- [web3-ethereum-defi repo](https://github.com/tradingstrategy-ai/web3-ethereum-defi?tab=readme-ov-file)
+  
 # Installation 
 - Clone repo
 - Cài python virtualenv cho project
