@@ -40,3 +40,7 @@ def getAmountOut(web3,tokenToSpendAmount, tokenToSpendAddress, tokenToBuyAddress
 	tokenToBuy = web3.to_checksum_address(tokenToBuyAddress)
 	tokenToSpend = web3.to_checksum_address(tokenToSpendAddress)
 	return router.functions.getAmountsOut(tokenToSpendAmount, [tokenToSpend, tokenToBuy]).call()
+
+def getAmountsOut(web3,tokenToSpendAmount, path) :
+	router = getRouterContract(web3)
+	return router.functions.getAmountsOut(tokenToSpendAmount, path).call()
