@@ -1,4 +1,3 @@
-from time import strftime,localtime
 import time
 import constant as c
 from eth_defi.event_reader.block_time import measure_block_time
@@ -18,7 +17,6 @@ def checkWalletInfo():
 	logger.info("Test-wallet has {} QFS".format(qfs.getBalance(web3,c.sender_address)))
 
 def checkQFSPrice():
-	start=strftime('%Y-%m-%d %H:%M:%S', localtime(time.time()))
 	path=[] # path = QFS > BNB > BUSD
 	path.append(web3.to_checksum_address(c.qfsAddress))
 	path.append(web3.to_checksum_address(c.wbnbAddress))
@@ -26,7 +24,7 @@ def checkQFSPrice():
 	amountIn=qfs.multiplyToInt(web3,1) # check for 1 QFS
 	amountOut=pancakeswap.getAmountsOut(web3,amountIn,path)
 	amountBusd=amountOut[2]/busd.getDecimalsPow(web3)
-	logger.info("{0:}	1 QFS = {1:.18f} BUSD".format(start, amountBusd))
+	logger.info("1 QFS = {0:.18f} BUSD".format(amountBusd))
 
 def swapTokens():
 	# Swap buy-spend pair
