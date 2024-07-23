@@ -3,6 +3,7 @@ import time
 import constant as c
 from eth_defi.event_reader.block_time import measure_block_time
 
+
 import common
 import pancakeswap
 import bnb
@@ -10,14 +11,11 @@ import qfs
 import busd
 
 web3 = common.connectBSC()
-
+logger = common.setupLogging('qfs.log')
 
 def checkWalletInfo():
-	print("====================================================================")
-	print("============================ Wallet info ===========================\n")
-	print("Test-wallet has {} BNB, done {} transactions".format(bnb.getBalance(web3,c.sender_address), bnb.getNonce(web3,c.sender_address)))
-	print("Test-wallet has {} QFS ".format(qfs.getBalance(web3,c.sender_address)))
-	print("\n\n\n\n")	
+	logger.info("Test-wallet has {} BNB, done {} transactions".format(bnb.getBalance(web3,c.sender_address), bnb.getNonce(web3,c.sender_address)))
+	logger.info("Test-wallet has {} QFS".format(qfs.getBalance(web3,c.sender_address)))
 
 def checkQFSPrice():
 	start=strftime('%Y-%m-%d %H:%M:%S', localtime(time.time()))
@@ -28,7 +26,7 @@ def checkQFSPrice():
 	amountIn=qfs.multiplyToInt(web3,1) # check for 1 QFS
 	amountOut=pancakeswap.getAmountsOut(web3,amountIn,path)
 	amountBusd=amountOut[2]/busd.getDecimalsPow(web3)
-	print("--------- {0:} -----   1QFS = {1:.18f} BUSD\n".format(start, amountBusd))
+	logger.info("{0:}	1 QFS = {1:.18f} BUSD".format(start, amountBusd))
 
 def swapTokens():
 	# Swap buy-spend pair
@@ -37,14 +35,13 @@ def swapTokens():
 
 
 def main():
-	print("====================================================================")
-	print("============================== Prices ==============================\n")
+	checkWalletInfo()
+	logger.info("Start watching & trading: QFS.....")
 	while True:
 		# Start schedule for checking price, running every 2 second
 		checkQFSPrice()
 		block_time = measure_block_time(web3)
 		time.sleep(block_time)
-
-
+	
 if __name__ == "__main__":
     main()
