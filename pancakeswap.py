@@ -27,7 +27,7 @@ def approve(web3, tokenAmount, token, spender_address, wallet_address, private_k
       'from': wallet_address, 
       'nonce': web3.eth.get_transaction_count(wallet_address),
 	#   'gas': getEstimatedGas(web3,wallet_address,web3.eth.get_transaction_count(wallet_address), False),
-	  'gasPrice': web3.to_wei('1','gwei'),  # =  1.000.000.000 wei
+	  'gasPrice': web3.to_wei(c.GAS_PRICE,'gwei'),
       }) 
   signed_tx = web3.eth.account.sign_transaction(tx, private_key)
   tx_hash = web3.eth.send_raw_transaction(signed_tx.rawTransaction)
@@ -51,7 +51,7 @@ def buyTokens(web3,bnbAmount,tokenAddress,senderAddress):
 			'from': senderAddress,
 			'value': bnbAmount, #This is the amount you want to Swap from
 			# 'gas': getEstimatedGas(web3,senderAddress,nonce, True),
-			'gasPrice': web3.to_wei('2','gwei'), 
+			'gasPrice': web3.to_wei(c.GAS_PRICE,'gwei'), 
 			'nonce': nonce,
 		})
 		# Sign txn
@@ -99,7 +99,7 @@ def sellTokens(web3,tokenAmount,tokenAddress,tokenContract,senderAddress):
 			).build_transaction({
 			'from':senderAddress,
 			# 'gas': getEstimatedGas(web3,senderAddress,web3.eth.get_transaction_count(senderAddress), True),
-			'gasPrice': web3.to_wei('2','gwei'), 
+			'gasPrice': web3.to_wei(c.GAS_PRICE,'gwei'), 
 			'nonce': web3.eth.get_transaction_count(senderAddress),
 		})
 		

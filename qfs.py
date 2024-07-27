@@ -3,7 +3,7 @@ import math as Math
 import decimal
 
 UPPER_LIMIT=0.00060 #0.0006
-LOWER_LIMIT=0.00035 #0.00035
+LOWER_LIMIT=0.00040 #0.00035
 MIN_AMOUNT=1000 
 
 def getName():

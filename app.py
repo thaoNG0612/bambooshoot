@@ -54,7 +54,10 @@ def buyQFS():
 		try:
 			result=web3.eth.get_transaction_receipt(tid)
 			status=int(result.status)
-			logger.info("Success = {}".format(status))	
+			logger.info("Success = {}".format(status))
+			if status==0:
+				logger.info("Status = {} | Failed txn!".format(status))	
+				status=-1 #failed txn, get out of loop
 		except Exception as e :
 			# logger.info("Let's wait! Got exception: {}".format(e))
 			logger.info("...")
@@ -72,7 +75,9 @@ def sellQFS():
 		try:
 			result=web3.eth.get_transaction_receipt(tid)
 			status=int(result.status)
-			logger.info("Success = {}".format(status))	
+			if status==0:
+				logger.info("Status = {} | Failed txn!".format(status))	
+				status=-1 #failed txn, get out of loop
 		except Exception as e :
 			# logger.info("Let's wait! Got exception: {}".format(e))
 			logger.info("...")
