@@ -12,12 +12,10 @@ logger = common.getLogger()
 
 def checkWalletInfo():
 	logger.info("======= WALLET {} INFO =======".format(c.sender_address))
-	logger.info("Done {} transactions | {} BNB ( {} BUSD ) | {} QFS | Range: [{:.18f} - {:.18f}] ".format(
-				 bnb.getNonce(web3,c.sender_address), 
-				 bnb.getBalance(web3,c.sender_address),
-				 calculateBUSD(bnb.getBalance(web3,c.sender_address), bnb),
-				 qfs.getBalance(web3,c.sender_address), 
-				 qfs.LOWER_LIMIT,qfs.UPPER_LIMIT))
+	logger.info("Done {} transactions".format(bnb.getNonce(web3,c.sender_address)))
+	logger.info("Has {} BNB ( {} BUSD )".format(bnb.getBalance(web3,c.sender_address),calculateBUSD(bnb.getBalance(web3,c.sender_address), bnb)))
+	logger.info("Has {} QFS".format(qfs.getBalance(web3,c.sender_address)))
+	logger.info("Range trading {}: [{:.5f} - {:.5f}] ".format(qfs.getName(),qfs.LOWER_LIMIT,qfs.UPPER_LIMIT))
 	logger.info("======================================================================\n")
 
 # Calculate amount of BUSD from amount of specific token
@@ -47,7 +45,7 @@ def calculateBNB(busdAmount):
 		return 0
 
 def buyQFS():
-	bnbAmount=calculateBNB(5) # Get BNB amount of [constans.BUY_AMOUNT] USD 
+	bnbAmount=calculateBNB(c.BUY_AMOUNT) # Get BNB amount of [constans.BUY_AMOUNT] USD 
 	# Spend: BNB, Buy: QFS
 	tid = pancakeswap.buyTokens(web3,bnb.multiplyToInt(web3,bnbAmount),c.qfsAddress,c.sender_address)
 	logger.info("----  Bought QFS from {} BNB : https://bscscan.com/tx/{}".format(bnbAmount, web3.to_hex(tid)))
@@ -56,9 +54,10 @@ def buyQFS():
 		try:
 			result=web3.eth.get_transaction_receipt(tid)
 			status=int(result.status)
-			logger.info("Buy txn success!")
+			logger.info("Success = {}".format(status))	
 		except Exception as e :
-			logger.info("Let's wait! Got exception: {}".format(e))
+			# logger.info("Let's wait! Got exception: {}".format(e))
+			logger.info("...")
 		finally:
 			time.sleep(2)
 	return tid
@@ -73,9 +72,10 @@ def sellQFS():
 		try:
 			result=web3.eth.get_transaction_receipt(tid)
 			status=int(result.status)
-			logger.info("Sell txn success! ==> {}".format(result))
+			logger.info("Success = {}".format(status))	
 		except Exception as e :
-			logger.info("Let's wait! Got exception: {}".format(e))
+			# logger.info("Let's wait! Got exception: {}".format(e))
+			logger.info("...")
 		finally:
 			time.sleep(2)
 	return tid
@@ -88,10 +88,10 @@ def watchQFS():
 		logger.info("1 QFS = {:.18f} BUSD ||| QFS in Wallet: {}".format(price, qfsInWallet))
 
 		if (price <= qfs.LOWER_LIMIT) and (qfsInWallet < qfs.MIN_AMOUNT):
-			#buyQFS()
+			buyQFS()
 			checkWalletInfo()
 		elif (price >= qfs.UPPER_LIMIT) and (qfsInWallet >= qfs.MIN_AMOUNT):
-			#sellQFS()
+			sellQFS() 
 			checkWalletInfo()
 		
 		time.sleep(c.PRICE_CHECK_INTERVAL)

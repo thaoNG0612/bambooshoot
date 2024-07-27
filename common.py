@@ -25,7 +25,7 @@ logging.info('Logger is initiated.')
 def connectBSC():
     web3 = Web3(Web3.HTTPProvider(c.bsc))
     web3.middleware_onion.inject(geth_poa_middleware, layer=0)
-    print("Connected to BSC blockchain: {}".format(web3.is_connected()))
+    logging.info("Connected to BSC blockchain: {}\n".format(web3.is_connected()))
     return web3
 
 def getLogger():
