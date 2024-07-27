@@ -82,7 +82,13 @@ def sellQFS():
 
 def watchQFS():
 	logger.info("Start watching & trading: QFS")
+	counter = 0
 	while True:
+		# After 20 checks, recheck and logging wallet info
+		counter+=1
+		if counter == 20:
+			checkWalletInfo()
+			counter = 0
 		qfsInWallet=qfs.getBalance(web3,c.sender_address)
 		price=calculateBUSD(1, qfs)# check for 1 QFS
 		logger.info("1 QFS = {:.18f} BUSD ||| QFS in Wallet: {}".format(price, qfsInWallet))
