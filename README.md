@@ -9,7 +9,7 @@ Em là búp măng non, em lớn lên trong nhiều ý tưởng...
 # Installation 
 - Clone repo
 - Cài python virtualenv cho project : `python -m venv env`
-- Mở cmd tại vị trí của project => active venv của project: `env\Script\activate.bat` for Window , `source .\env\Script\activate` for Mac (maybe for Linux too, let's try :D)
+- Mở cmd tại vị trí của project => active venv của project: `env\Scripts\activate.bat` for Window , `source .\env\Script\activate` for Mac (maybe for Linux too, let's try :D)
   
   ![image](https://github.com/user-attachments/assets/d0b75edb-23cf-4396-9733-9b70373e5eac) =>  ![image](https://github.com/user-attachments/assets/de89694b-e148-4956-ac54-60ac79cc18fb)
 
