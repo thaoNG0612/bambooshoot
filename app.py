@@ -1,21 +1,18 @@
 import time
 
 import constant as c
-import common
-import pancakeswap
-import bnb
-import qfs
-import busd
+from defilib import *
+from tokenslib import *
 
 web3 = common.connectBSC()
-logger = common.getLogger()
+logger = common.setupLogger(__name__, c.LOG_FILE)
 
 def checkWalletInfo():
 	logger.info("======= WALLET {} INFO =======".format(c.sender_address))
 	logger.info("Done {} transactions".format(bnb.getNonce(web3,c.sender_address)))
 	logger.info("Has {} BNB ( {} BUSD )".format(bnb.getBalance(web3,c.sender_address),calculateBUSD(bnb.getBalance(web3,c.sender_address), bnb)))
-	logger.info("Has {} QFS".format(qfs.getBalance(web3,c.sender_address)))
-	logger.info("Range trading {}: [{:.5f} - {:.5f}] ".format(qfs.getName(),qfs.LOWER_LIMIT,qfs.UPPER_LIMIT))
+	for token in c.TRADING_LIST:
+		logger.info("Has {} {} || Range trading: [{:.9f} - {:.9f}] ".format(token.getBalance(web3,c.sender_address), token.getName(), token.LOWER_LIMIT,token.UPPER_LIMIT))
 	logger.info("======================================================================\n")
 
 # Calculate amount of BUSD from amount of specific token
@@ -34,8 +31,8 @@ def calculateBUSD(fromTokenAmount,tokenUtil):
 def calculateBNB(busdAmount):
 	try:
 		path=[] # path = BUSD > BNB
-		path.append(web3.to_checksum_address(c.busdAddress))
-		path.append(web3.to_checksum_address(c.wbnbAddress))
+		path.append(web3.to_checksum_address(busd.ADDRESS))
+		path.append(web3.to_checksum_address(bnb.ADDRESS))
 		amountIn=busd.multiplyToInt(web3,busdAmount) 
 		amountOut=pancakeswap.getAmountsOut(web3,amountIn,path)
 		amountBnb=amountOut[1]/bnb.getDecimalsPow(web3)
@@ -44,11 +41,11 @@ def calculateBNB(busdAmount):
 		logger.error("[{}] calculateBNB: {}".format(bnb.getName(), e))
 		return 0
 
-def buyQFS():
+def buy(token):
 	bnbAmount=calculateBNB(c.BUY_AMOUNT) # Get BNB amount of [constans.BUY_AMOUNT] USD 
-	# Spend: BNB, Buy: QFS
-	tid = pancakeswap.buyTokens(web3,bnb.multiplyToInt(web3,bnbAmount),c.qfsAddress,c.sender_address)
-	logger.info("----  Bought QFS from {} BNB : https://bscscan.com/tx/{}".format(bnbAmount, web3.to_hex(tid)))
+	# Spend: BNB, Buy: Token
+	tid = pancakeswap.buyTokens(web3,bnb.multiplyToInt(web3,bnbAmount),token.ADDRESS,c.sender_address)
+	logger.info("----  Bought {} from {} BNB : https://bscscan.com/tx/{}".format(token.getName(), bnbAmount, web3.to_hex(tid)))
 	status=0
 	while status==0:
 		try:
@@ -65,11 +62,11 @@ def buyQFS():
 			time.sleep(2)
 	return tid
 
-def sellQFS():
-	qfsInWallet=qfs.getBalance(web3,c.sender_address)
-	# Spend: QFS, Buy: BNB
-	tid = pancakeswap.sellTokens(web3,qfs.multiplyToInt(web3,qfsInWallet),c.qfsAddress,qfs.getContract(web3),c.sender_address)
-	logger.info("---- Sold {} QFS : https://bscscan.com/tx/{}".format(qfsInWallet, web3.to_hex(tid)))
+def sell(token):
+	tokenInWallet=token.getBalance(web3,c.sender_address)
+	# Spend: Token, Buy: BNB
+	tid = pancakeswap.sellTokens(web3,token.multiplyToInt(web3,tokenInWallet),token.ADDRESS,token.getContract(web3),c.sender_address)
+	logger.info("---- Sold {} {} : https://bscscan.com/tx/{}".format(tokenInWallet, token.getName(), web3.to_hex(tid)))
 	status=0
 	while status==0:
 		try:
@@ -85,32 +82,42 @@ def sellQFS():
 			time.sleep(2)
 	return tid
 
-def watchQFS():
-	logger.info("Start watching & trading: QFS")
+def watch(token):
+	logger.info("Start watching & trading: {}".format(token.getName()))
 	counter = 0
 	while True:
-		# After 20 checks, recheck and logging wallet info
+		tokenInWallet=token.getBalance(web3,c.sender_address)
+		price=calculateBUSD(1, token)# check for 1 token
+		# Only log price to console after 20 checks
 		counter+=1
 		if counter == 20:
-			checkWalletInfo()
+			logger.info("1 {} = {:.18f} BUSD ||| Token in Wallet: {}".format(token.getName(), price, tokenInWallet))
 			counter = 0
-		qfsInWallet=qfs.getBalance(web3,c.sender_address)
-		price=calculateBUSD(1, qfs)# check for 1 QFS
-		logger.info("1 QFS = {:.18f} BUSD ||| QFS in Wallet: {}".format(price, qfsInWallet))
-
-		if (price <= qfs.LOWER_LIMIT) and (qfsInWallet < qfs.MIN_AMOUNT):
-			buyQFS()
+			
+		if (price <= token.LOWER_LIMIT) and (tokenInWallet < token.MIN_AMOUNT):
+			buy(token)
 			checkWalletInfo()
-		elif (price >= qfs.UPPER_LIMIT) and (qfsInWallet >= qfs.MIN_AMOUNT):
-			sellQFS() 
+		elif (price >= token.UPPER_LIMIT) and (tokenInWallet >= token.MIN_AMOUNT):
+			sell(token) 
 			checkWalletInfo()
 		
 		time.sleep(c.PRICE_CHECK_INTERVAL)
 	
 
-def main():
-	checkWalletInfo()
-	watchQFS()
+def main(token):
+	global logger
+	logger = common.setupLogger(token.getName(), c.LOG_FILE)
+	watch(token)
 	
 if __name__ == "__main__":
-    main()
+	checkWalletInfo()
+	token = str.lower(input('What token to run [QFS,SHIB]?\n'))
+	match token:
+		case "qfs":
+			main(qfs)
+		case "shib":
+			main(shib)
+		case _:
+			"Token not found."
+
+    

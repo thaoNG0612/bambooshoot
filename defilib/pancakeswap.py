@@ -1,9 +1,11 @@
 import config #locally store on your machine only, DO NOT COMMIT THIS FILE TO GIT   !!!!!
 import time
 import constant as c
-import common
+import defilib.common as common
+from tokenslib import bnb
 
-logger = common.getLogger()
+# init logger
+logger = common.setupLogger(__name__, c.LOG_FILE)
 
 def getRouterContract(web3):
 	return web3.eth.contract(address=c.panRouterContractAddress, abi=c.panAbi)
@@ -40,7 +42,7 @@ def buyTokens(web3,bnbAmount,tokenAddress,senderAddress):
 		router = getRouterContract(web3)
 		# Buy & spend tokens
 		tokenToBuy = web3.to_checksum_address(tokenAddress)
-		tokenToSpend = web3.to_checksum_address(c.wbnbAddress)
+		tokenToSpend = web3.to_checksum_address(bnb.ADDRESS)
 		#Build txn
 		pancakeswap2_txn=router.functions.swapExactETHForTokens(
 			0, # set to 0, or specify minimum amount of tokens you want to receive - consider decimals!!!
@@ -71,7 +73,7 @@ def sellTokens(web3,tokenAmount,tokenAddress,tokenContract,senderAddress):
 	try:
 		router = getRouterContract(web3)
 		# Buy & spend tokens
-		tokenToBuy = web3.to_checksum_address(c.wbnbAddress)
+		tokenToBuy = web3.to_checksum_address(bnb.ADDRESS)
 		tokenToSpend = web3.to_checksum_address(tokenAddress)
 
 		# Approve Pancakeswap to spend token from wallet
