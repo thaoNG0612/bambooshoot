@@ -5,7 +5,7 @@ from tokenslib import *
 ########### GENERAL CONSTANTS##############################
 TRADING_LIST=[qfs,shib]
 PRICE_CHECK_INTERVAL=1 #seconds
-BUY_AMOUNT=0.5 #USD
+BUY_AMOUNT=1 #USD
 TXN_SPEED_UP_TIMES=1.2
 GAS_PRICE='3' #gwei
 LOG_FILE="general.log"

@@ -86,24 +86,26 @@ def watch(token):
 	logger.info("Start watching & trading: {}".format(token.getName()))
 	counter = 0
 	while True:
-		tokenInWallet=token.getBalance(web3,c.sender_address)
-		price=calculateBUSD(1, token)# check for 1 token
-		# Only log price to console after 20 checks
-		counter+=1
-		if counter == 20:
-			logger.info("1 {} = {:.18f} BUSD ||| Token in Wallet: {}".format(token.getName(), price, tokenInWallet))
-			counter = 0
-			
-		if (price <= token.LOWER_LIMIT) and (tokenInWallet < token.MIN_AMOUNT):
-			buy(token)
-			checkWalletInfo()
-		elif (price >= token.UPPER_LIMIT) and (tokenInWallet >= token.MIN_AMOUNT):
-			sell(token) 
-			checkWalletInfo()
+		try:
+			tokenInWallet=token.getBalance(web3,c.sender_address)
+			price=calculateBUSD(1, token)# check for 1 token
+			# Only log price to console after 20 checks
+			counter+=1
+			if counter == 20:
+				logger.info("1 {} = {:.18f} BUSD ||| Token in Wallet: {}".format(token.getName(), price, tokenInWallet))
+				counter = 0
+				
+			if (price <= token.LOWER_LIMIT) and (tokenInWallet < token.MIN_AMOUNT):
+				buy(token)
+				checkWalletInfo()
+			elif (price >= token.UPPER_LIMIT) and (tokenInWallet >= token.MIN_AMOUNT):
+				sell(token) 
+				checkWalletInfo()
+		except Exception as e :
+			logger.error(e)
+		finally:
+			time.sleep(c.PRICE_CHECK_INTERVAL)	
 		
-		time.sleep(c.PRICE_CHECK_INTERVAL)
-	
-
 def main(token):
 	global logger
 	logger = common.setupLogger(token.getName(), c.LOG_FILE)
