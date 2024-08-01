@@ -14,7 +14,7 @@ Em là búp măng non, em lớn lên trong nhiều ý tưởng...
   ![image](https://github.com/user-attachments/assets/d0b75edb-23cf-4396-9733-9b70373e5eac) =>  ![image](https://github.com/user-attachments/assets/de89694b-e148-4956-ac54-60ac79cc18fb)
 
 
-- Install các thư viện: `time`, `web3`, `schedule` bằng `pip install`
+- Install các thư viện: `time`, `web3`, `logging` bằng `pip install`
 - Run `python app.py`
 
 
