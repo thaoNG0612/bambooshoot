@@ -4,7 +4,6 @@ Em là búp măng non, em lớn lên trong nhiều ý tưởng...
 # References
 - [Introduction about blockchain (with Ethereum)](https://snakecharmers.ethereum.org/a-developers-guide-to-ethereum-pt-1/)
 - [Web3.py: a library to interact with blockchain network](https://web3py.readthedocs.io/en/stable/)
-- [web3-ethereum-defi repo: an open-source module to use web3 easier](https://github.com/tradingstrategy-ai/web3-ethereum-defi?tab=readme-ov-file)
   
 # Installation 
 - Clone repo
